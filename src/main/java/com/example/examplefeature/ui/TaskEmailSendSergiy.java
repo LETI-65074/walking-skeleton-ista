@@ -26,7 +26,7 @@ import static com.vaadin.flow.spring.data.VaadinSpringDataHelpers.toSpringPageRe
 @Route("tasks-email")
 @PageTitle("Send Email (read-only)")
 @Menu(order = 1, icon = "vaadin:envelope", title = "Send Email (read-only)")
-public class TaskEmailSend extends Main {
+public class TaskEmailSendSergiy extends Main {
 
     private final TaskService taskService;
     private final Grid<Task> grid = new Grid<>();
@@ -44,7 +44,7 @@ public class TaskEmailSend extends Main {
                     .withLocale(getLocale())
                     .withZone(ZoneId.systemDefault());
 
-    public TaskEmailSend(TaskService taskService) {
+    public TaskEmailSendSergiy(TaskService taskService) {
         this.taskService = taskService;
 
         setSizeFull();
