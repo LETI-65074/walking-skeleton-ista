@@ -34,6 +34,7 @@ public class TaskEmailSend extends Main {
 
     private EmailField recipient;
     private Button sendBtn;
+    private Task selectedTask;              // guarda a tarefa selecionada
 
     // Mesmos formatadores usados na TaskListView
     private final DateTimeFormatter dateFormatter =
@@ -79,6 +80,8 @@ public class TaskEmailSend extends Main {
 
 
         initEmailControls(); // <- chama antes de construir a toolbar
+        initGridSelection();
+        setupEmailField();
 
 // onde adicionas a toolbar, junta mais um "group" com os novos controlos:
         add(new ViewToolbar("Giimail",
@@ -102,16 +105,44 @@ public class TaskEmailSend extends Main {
 
     private void onSendClick() {
         String to = recipient.getValue();
-        if (to == null || to.isBlank() || !recipient.isInvalid() && !recipient.isEmpty() && !recipient.getValue().contains("@")) {
-            // validação simples — podes trocar por recipient.isInvalid() se usares setPattern(...)
-        }
-        if (to == null || to.isBlank()) {
-            Notification.show("Indica um destinatário.", 3000, Notification.Position.BOTTOM_END)
+
+        // validações
+        if (to == null || to.isBlank() || recipient.isInvalid()) {
+            Notification.show("Indica um destinatário válido.", 3000, Notification.Position.BOTTOM_END)
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
             return;
         }
-        Notification.show("OK: (simulação) enviar para " + to, 3000, Notification.Position.BOTTOM_END)
+        if (selectedTask == null) {
+            Notification.show("Seleciona uma tarefa na lista.", 3000, Notification.Position.BOTTOM_END)
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+            return;
+        }
+
+        // prepara texto amigável
+        String due = Optional.ofNullable(selectedTask.getDueDate())
+                .map(dateFormatter::format)      // LocalDate -> usa o teu dateFormatter
+                .orElse("Sem prazo");
+
+        String msg = "Simulação: enviar tarefa \"" + selectedTask.getDescription()
+                + "\" (prazo: " + due + ") para " + to;
+
+        Notification.show(msg, 5000, Notification.Position.BOTTOM_END)
                 .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
+
+    private void initGridSelection() {
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.asSingleSelect().addValueChangeListener(ev -> {
+            selectedTask = ev.getValue(); // pode ser null se desselecionar
+        });
+    }
+
+    private void setupEmailField() {
+        recipient.setRequiredIndicatorVisible(true);
+        recipient.setErrorMessage("Indica um email válido");
+        // EmailField já valida formato básico; se quiseres obrigar domínio da escola:
+        // recipient.setPattern("^[^@\\s]+@iscte\\.pt$");
     }
 
 
