@@ -12,9 +12,15 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+import com.vaadin.flow.component.login.LoginOverlay;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.example.examplefeature.ui.TaskEmailSendSergiy;
+
+
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -36,6 +42,15 @@ public class TaskEmailSendSergiy extends Main {
     private Button sendBtn;
     private Task selectedTask;              // guarda a tarefa selecionada
 
+    private final LoginOverlay authOverlay = new LoginOverlay();
+    private boolean authenticated = false;
+
+    @Value("${app.auth.user:aluno}")
+    private String authUser;
+
+    @Value("${app.auth.pass:senha123}")
+    private String authPass;
+
     // Mesmos formatadores usados na TaskListView
     private final DateTimeFormatter dateFormatter =
             DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(getLocale());
@@ -44,8 +59,13 @@ public class TaskEmailSendSergiy extends Main {
                     .withLocale(getLocale())
                     .withZone(ZoneId.systemDefault());
 
-    public TaskEmailSendSergiy(TaskService taskService) {
+
+    private final EmailServiceSergiy emailService;
+    public TaskEmailSendSergiy(TaskService taskService, EmailServiceSergiy emailService) {
         this.taskService = taskService;
+        this.emailService = emailService;
+                    // <- final é ok
+
 
         setSizeFull();
         addClassNames(
@@ -89,6 +109,22 @@ public class TaskEmailSendSergiy extends Main {
                 ViewToolbar.group(recipient, sendBtn)   // <- adiciona este grupo
         ));
 
+        authOverlay.setTitle("Confirmação");
+        authOverlay.setDescription("Autentica para enviar email");
+        authOverlay.setForgotPasswordButtonVisible(false);
+        authOverlay.addLoginListener(e -> {
+            if (authUser.equals(e.getUsername()) && authPass.equals(e.getPassword())) {
+                authenticated = true;
+                System.out.println(authUser + " " + authPass + " login feito") ;
+                authOverlay.setOpened(false);
+                // chama o envio real agora que está autenticado
+                doSendSelectedTask();  // método que envia de facto
+            } else {
+                authOverlay.setError(true);
+            }
+        });
+
+
         add(grid);
     }
 
@@ -118,17 +154,15 @@ public class TaskEmailSendSergiy extends Main {
             return;
         }
 
-        // prepara texto amigável
-        String due = Optional.ofNullable(selectedTask.getDueDate())
-                .map(dateFormatter::format)      // LocalDate -> usa o teu dateFormatter
-                .orElse("Sem prazo");
 
-        String msg = "Simulação: enviar tarefa \"" + selectedTask.getDescription()
-                + "\" (prazo: " + due + ") para " + to;
+        if (!authenticated) {
+            authOverlay.setOpened(true);
+        }
 
-        Notification.show(msg, 5000, Notification.Position.BOTTOM_END)
-                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+        doSendSelectedTask();
     }
+
 
 
     private void initGridSelection() {
@@ -144,6 +178,24 @@ public class TaskEmailSendSergiy extends Main {
         // EmailField já valida formato básico; se quiseres obrigar domínio da escola:
         // recipient.setPattern("^[^@\\s]+@iscte\\.pt$");
     }
+
+    private void doSendSelectedTask() {
+        String to = recipient.getValue();
+        String due = Optional.ofNullable(selectedTask.getDueDate())
+                .map(dateFormatter::format).orElse("Sem prazo");
+        String subject = "Task selecionada";
+        String body = "Descrição da tarefa: " + selectedTask.getDescription() + "\nPrazo: " + due;
+
+        try {
+            emailService.sendPlainText( to, subject, body);
+            Notification.show("Email enviado para " + to, 3000, Notification.Position.BOTTOM_END)
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        } catch (Exception ex) {
+            Notification.show("Falha ao enviar: " + ex.getMessage(), 6000, Notification.Position.BOTTOM_END)
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
 
 
 }
