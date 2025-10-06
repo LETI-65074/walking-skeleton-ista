@@ -30,7 +30,7 @@ import java.util.Optional;
 import static com.vaadin.flow.spring.data.VaadinSpringDataHelpers.toSpringPageRequest;
 
 @Route("tasks-email")
-@PageTitle("Send Email (read-only)")
+@PageTitle("Send Email")
 @Menu(order = 1, icon = "vaadin:envelope", title = "Send Email (read-only)")
 public class TaskEmailSendSergiy extends Main {
 
