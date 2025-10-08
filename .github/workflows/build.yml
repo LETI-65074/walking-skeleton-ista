@@ -33,3 +33,15 @@ jobs:
           path: '**/target/*.jar'   # apanha single ou multi-módulo
           if-no-files-found: error
           retention-days: 7
+
+      - name: Copiar JAR para a raiz do workspace
+        run: cp **/target/*.jar .
+
+      - name: Publicar artefacto (.jar)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar-${{ github.ref_name }}-${{ github.run_number }}
+          path: |
+            **/target/*.jar
+            ./*.jar         # também apanha o que copiaste para a raiz
+          if-no-files-found: error
