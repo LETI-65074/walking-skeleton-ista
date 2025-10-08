@@ -1,1 +1,35 @@
+name: Build JAR
 
+on:
+  push:
+    branches: [ main ]   # 3(a): corre quando houver push para a branch principal
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21           # 3(b)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Build com Maven (gera .jar) # 3(c)
+        run: |
+          if [ -f ./mvnw ]; then
+            ./mvnw -B clean package
+          else
+            mvn -B clean package
+          fi
+
+      - name: Publicar artefacto (.jar)   # 3(d)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: '**/target/*.jar'   # apanha single ou multi-módulo
+          if-no-files-found: error
+          retention-days: 7
