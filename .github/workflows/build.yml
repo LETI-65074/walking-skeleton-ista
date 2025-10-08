@@ -21,9 +21,9 @@ jobs:
       - name: Build com Maven (gera .jar) # 3(c)
         run: |
           if [ -f ./mvnw ]; then
-            ./mvnw -B clean package
+            ./mvnw -B -Pproduction -Dmaven.test.skip=true clean package
           else
-            mvn -B clean package
+            mvn -B -Pproduction -Dmaven.test.skip=true clean package
           fi
 
       - name: Publicar artefacto (.jar)   # 3(d)
