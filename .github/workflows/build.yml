@@ -42,3 +42,7 @@ jobs:
             ./*.jar
           if-no-files-found: error
           retention-days: 7
+
+      - name: Listar ficheiros na raiz do workspace
+        run: ls -lah
+
