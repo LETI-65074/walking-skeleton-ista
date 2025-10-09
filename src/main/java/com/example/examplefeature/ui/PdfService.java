@@ -99,8 +99,6 @@ public class PdfService {
            </body></html>
            """;
     }
-}
-
 
     private String esc(String s) {
         if (s == null) return "";
