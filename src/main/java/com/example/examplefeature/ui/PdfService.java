@@ -1,12 +1,22 @@
 package com.example.examplefeature.ui;
 
-import com.vaadin.flow.router.Menu;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.example.examplefeature.Task;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
-@Route("gerar-pdf")
-@PageTitle("Gerar PDF")
-@Menu(order = 1, icon = "vaadin:file-text", title = "Gerar PDF")
+import java.io.ByteArrayOutputStream;
+import java.util.Locale;
 
 public class PdfService {
+    public byte[] taskToPdf(Task t, Locale locale) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            String html = buildHtmlForTask(t, locale);
+            new PdfRendererBuilder().useFastMode().withHtmlContent(html, null).toStream(out).run();
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao gerar PDF", e);
+        }
+    }
+
+    private String buildHtmlForTask(Task t, Locale locale) {
+    }
 }
