@@ -2,6 +2,7 @@ package com.example.examplefeature.ui;
 
 import com.example.examplefeature.Task;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.time.ZoneId;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-
+@Service
 public class PdfService {
     public byte[] taskToPdf(Task t, Locale locale) {    //recebe uma tarefa e a converte num ficheiro PDF (em bytes)
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
