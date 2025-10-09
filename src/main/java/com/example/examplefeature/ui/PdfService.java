@@ -53,6 +53,20 @@ public class PdfService {
            """.formatted(desc, due, created, esc(java.time.LocalDateTime.now().toString()));
         }
 
+    //gera um PDF com TODAS as tarefas como tabela.
+    public byte[] tasksToPdf(List<Task> tasks, Locale locale) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            String html = buildHtmlForTasks(tasks, locale);
+            new PdfRendererBuilder().useFastMode().withHtmlContent(html, null).toStream(out).run();
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Falha ao gerar PDF (todas as tarefas)", e);
+        }
+    }
+
+    private String buildHtmlForTasks(List<Task> tasks, Locale locale) {
+    }
+
 
     private String esc(String s) {
         if (s == null) return "";
