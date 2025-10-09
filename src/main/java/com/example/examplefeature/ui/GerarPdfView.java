@@ -12,8 +12,14 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import org.springframework.data.domain.PageRequest;
+
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import static com.vaadin.flow.spring.data.VaadinSpringDataHelpers.toSpringPageRequest;
-import static org.apache.commons.compress.utils.ArchiveUtils.sanitize;
 
 @Route("gerar-pdf")
 @PageTitle("Gerar PDF")
@@ -67,7 +73,34 @@ class GerarPdfView extends Main {
         add(nome, imprimirTodas, imprimir, grid);
         setSizeFull();
     }
-
     private void imprimirAcao() {
+        try {
+            String base = (nome.getValue() == null || nome.getValue().isBlank())
+                    ? (imprimirTodas.getValue() ? "tarefas" : "tarefa")
+                    : sanitize(nome.getValue());
+
+            byte[] pdf;
+            if (imprimirTodas.getValue()) {
+                // busca “grande” simples (ajuste o tamanho se necessário)
+                List<Task> tasks = taskService.list(PageRequest.of(0, 10_000));
+                pdf = pdfService.tasksToPdf(tasks, getLocale());
+            } else {
+                Task t = grid.asSingleSelect().getValue();
+                if (t == null) return; // nada selecionado
+                if (nome.isEmpty() || nome.getValue().isBlank()) {
+                    base = sanitize(t.getDescription() == null ? "tarefa" : t.getDescription());
+                }
+                pdf = pdfService.taskToPdf(t, getLocale());
+            }
+
+            String ts = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(LocalDateTime.now());
+            String niceName = base + "_" + ts + ".pdf";
+
+            //getUI().ifPresent(ui -> ui.accessLater(a::remove));
+            nome.clear();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
+    private String sanitize(String s) {return s.strip().replaceAll("[^\\p{L}\\p{N}_-]+", "_"); }
 }
