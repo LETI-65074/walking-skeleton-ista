@@ -65,7 +65,41 @@ public class PdfService {
     }
 
     private String buildHtmlForTasks(List<Task> tasks, Locale locale) {
+        var dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+                .withLocale(locale).withZone(ZoneId.systemDefault());
+        var df  = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale);
+
+        StringBuilder rows = new StringBuilder();
+        for (Task t : tasks) {
+            String desc = esc(t.getDescription());
+            String due  = t.getDueDate() == null ? "Never" : esc(df.format(t.getDueDate()));
+            String created = esc(dtf.format(t.getCreationDate()));
+            rows.append("<tr><td>").append(desc)
+                    .append("</td><td>").append(due)
+                    .append("</td><td>").append(created)
+                    .append("</td></tr>");
+        }
+
+        // evitamos .formatted aqui para não conflitar com possíveis % em CSS
+        return """
+           <html><head><meta charset="utf-8"/>
+           <style>
+             @page { size:A4; margin:20mm; }
+             body{font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#222}
+             h1{font-size:18px;margin:0 0 12px}
+             table{width:100%;border-collapse:collapse}
+             th,td{padding:6px 8px;border-bottom:1px solid #ccc;text-align:left;vertical-align:top}
+           </style></head><body>
+           <h1>Lista de Tarefas</h1>
+           <table>
+             <thead><tr><th>Descrição</th><th>Due Date</th><th>Creation Date</th></tr></thead>
+             <tbody>""" + rows + """
+             </tbody>
+           </table>
+           </body></html>
+           """;
     }
+}
 
 
     private String esc(String s) {
