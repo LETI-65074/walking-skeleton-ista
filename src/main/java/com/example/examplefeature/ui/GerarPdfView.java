@@ -2,10 +2,12 @@ package com.example.examplefeature.ui;
 
 import com.example.examplefeature.Task;
 import com.example.examplefeature.TaskService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
@@ -95,6 +97,19 @@ class GerarPdfView extends Main {
 
             String ts = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(LocalDateTime.now());
             String niceName = base + "_" + ts + ".pdf";
+
+            Anchor a = new Anchor(ev -> {
+                ev.setContentType("application/pdf"); // inline
+                try (OutputStream os = ev.getOutputStream()) { os.write(pdf); }
+            }, "");
+            a.getElement().setAttribute("hidden", true);
+            add(a);
+
+            String url = a.getHref() + (a.getHref().contains("?") ? "&" : "?") + "name=" + niceName;
+            UI.getCurrent().getPage().executeJs(
+                    "const u=$0,i=document.createElement('iframe');i.style.display='none';i.src=u;i.onload=()=>{try{i.contentWindow.print()}catch(e){} setTimeout(()=>i.remove(),2000)};document.body.appendChild(i);",
+                    url
+            );
 
             //getUI().ifPresent(ui -> ui.accessLater(a::remove));
             nome.clear();
