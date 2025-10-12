@@ -36,29 +36,7 @@ jobs:
             mvn -B -Pproduction -Dmaven.test.skip=true clean package
           fi
 
-      - name: Copiar JAR para a raiz do workspace
-        shell: bash
-        run: |
-          shopt -s globstar nullglob
-          cp **/target/*.jar .
-
-      - name: Commit do JAR na raiz do repositório (requisito do enunciado)
-        if: ${{ github.ref == 'refs/heads/main' }}
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # adiciona apenas JARs na raiz
-          git add *.jar || true
-
-          # cria commit só se houver alterações
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(ci): adiciona JAR gerado à raiz do repositório [skip ci]"
-            git push
-          else
-            echo "Sem alterações para commitar"
-          fi
+     
 
       - name: Publicar artefacto (.jar)
         uses: actions/upload-artifact@v4

@@ -18,6 +18,9 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
+    @Transactional(readOnly = true)
+    public int count() { return Math.toIntExact(taskRepository.count()); }
+
     @Transactional
     public void createTask(String description, @Nullable LocalDate dueDate) {
         if ("fail".equals(description)) {
