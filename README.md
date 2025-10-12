@@ -1,86 +1,73 @@
-# App README
+Este repositório usa um workflow do GitHub Actions que, a cada push na branch main (ou por execução manual via workflow_dispatch), faz o build de produção da aplicação (perfil -Pproduction, Java 21, Maven) e publica o JAR como artefacto da execução.
+O que o workflow faz:
+•	Checkout do código com histórico completo (compatível com passos que precisem de histórico).
+•	Configuração do JDK 21 (Temurin) com cache de dependências Maven.
+•	Build Maven de produção: mvn -B -Pproduction -Dmaven.test.skip=true clean package
+(gera o JAR em target/).
+•	Publicação do artefacto: o(s) target/*.jar é(são) carregado(s) nos artefactos da execução, com retenção de 7 dias.
+Gatilhos e salvaguardas:
+•	Executa em push para main; pode ser corrido manualmente (Run workflow).
+•	paths-ignore: "*.jar" evita loops caso JARs sejam adicionados ao repositório.
+Como obter o JAR:
+•	Ir a Actions → (execução mais recente) → Artifacts e descarregar o ficheiro publicado.
+Benefício: garante build reprodutível e empacotamento automático em cada alteração integrada na main, centralizando a distribuição do binário diretamente nas execuções do Actions.
 
-- [ ] TODO Replace or update this README with instructions relevant to your application
+Excerto do workflow (`.github/workflows/build.yml`)
 
-## Project Structure
+name: Build JAR (Vaadin Prod + Commit JAR)
 
-The sources of your App have the following structure:
 
-```
-src
-├── main/frontend
-│   └── themes
-│       └── default
-│           ├── styles.css
-│           └── theme.json
-├── main/java
-│   └── [application package]
-│       ├── base
-│       │   └── ui
-│       │       ├── component
-│       │       │   └── ViewToolbar.java
-│       │       ├── MainErrorHandler.java
-│       │       └── MainLayout.java
-│       ├── examplefeature
-│       │   ├── ui
-│       │   │   └── TaskListView.java
-│       │   ├── Task.java
-│       │   ├── TaskRepository.java
-│       │   └── TaskService.java                
-│       └── Application.java       
-└── test/java
-    └── [application package]
-        └── examplefeature
-           └── TaskServiceTest.java                 
-```
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - "*.jar"                 # evita loop quando o bot commita o JAR
+  workflow_dispatch: {}
 
-The main entry point into the application is `Application.java`. This class contains the `main()` method that start up 
-the Spring Boot application.
 
-The skeleton follows a *feature-based package structure*, organizing code by *functional units* rather than traditional 
-architectural layers. It includes two feature packages: `base` and `examplefeature`.
+# Permissão para o GITHUB_TOKEN poder fazer push de commits
+permissions:
+  contents: write
 
-* The `base` package contains classes meant for reuse across different features, either through composition or 
-  inheritance. You can use them as-is, tweak them to your needs, or remove them.
-* The `examplefeature` package is an example feature package that demonstrates the structure. It represents a 
-  *self-contained unit of functionality*, including UI components, business logic, data access, and an integration test.
-  Once you create your own features, *you'll remove this package*.
 
-The `src/main/frontend` directory contains an empty theme called `default`, based on the Lumo theme. It is activated in
-the `Application` class, using the `@Theme` annotation.
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-## Starting in Development Mode
 
-To start the application in development mode, import it into your IDE and run the `Application` class. 
-You can also start the application from the command line by running: 
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # necessário para fazer commit & push
 
-```bash
-./mvnw
-```
 
-## Building for Production
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
 
-To build the application in production mode, run:
 
-```bash
-./mvnw -Pproduction package
-```
+      - name: Build Maven (produção)
+        run: |
+          if [ -f ./mvnw ]; then
+            ./mvnw -B -Pproduction -Dmaven.test.skip=true clean package
+          else
+            mvn -B -Pproduction -Dmaven.test.skip=true clean package
+          fi
 
-To build a Docker image, run:
+     
 
-```bash
-docker build -t my-application:latest .
-```
 
-If you use commercial components, pass the license key as a build secret:
+      - name: Publicar artefacto (.jar)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar-${{ github.ref_name }}-${{ github.run_number }}
+          path: |
+            **/target/*.jar
+            ./*.jar
+          if-no-files-found: error
+          retention-days: 7
 
-```bash
-docker build --secret id=proKey,src=$HOME/.vaadin/proKey .
-```
-
-## Getting Started
-
-The [Getting Started](https://vaadin.com/docs/latest/getting-started) guide will quickly familiarize you with your new
-App implementation. You'll learn how to set up your development environment, understand the project 
-structure, and find resources to help you add muscles to your skeleton — transforming it into a fully-featured 
-application.
