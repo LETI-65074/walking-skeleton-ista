@@ -7,7 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailServiceSergiy {
+public class EmailService {
 
     private final JavaMailSender sender;
 
@@ -16,7 +16,7 @@ public class EmailServiceSergiy {
 
     private String from = "liolikkotovich@gmail.com";
 
-    public EmailServiceSergiy(JavaMailSender sender) {
+    public EmailService(JavaMailSender sender) {
         this.sender = sender;
     }
 
