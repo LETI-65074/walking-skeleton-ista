@@ -39,23 +39,23 @@
 
         <!-- currency exchange dependencies start -->
         <dependency>
-            <groupId>com.squareup.retrofit2</groupId>
-            <artifactId>retrofit</artifactId>
-            <version>2.11.0</version>
+            <groupId>javax.money</groupId>
+            <artifactId>money-api</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
-            <groupId>com.squareup.retrofit2</groupId>
-            <artifactId>converter-jackson</artifactId>
-            <version>2.11.0</version>
+            <groupId>org.javamoney</groupId>
+            <artifactId>moneta</artifactId>
+            <version>1.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javamoney.moneta</groupId>
+            <artifactId>moneta-convert-ecb</artifactId>
+            <version>1.4.5</version>
         </dependency>
 
-        <!-- Optional: tiny cache for rates -->
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>3.1.8</version>
-        </dependency>
-        <!-- currency exchange dependencies ende -->
+
+        <!-- currency exchange dependencies end -->
 
         <dependency>
             <groupId>com.openhtmltopdf</groupId>
