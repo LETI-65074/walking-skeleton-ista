@@ -30,7 +30,7 @@ import static com.vaadin.flow.spring.data.VaadinSpringDataHelpers.toSpringPageRe
 @Route("tasks-email")
 @PageTitle("Send Email")
 @Menu(order = 1, icon = "vaadin:envelope", title = "Send Email")
-public class TaskEmailSendSergiy extends Main {
+public class TaskEmailSend extends Main {
 
     private final TaskService taskService;
     private final Grid<Task> grid = new Grid<>();
@@ -58,8 +58,8 @@ public class TaskEmailSendSergiy extends Main {
                     .withZone(ZoneId.systemDefault());
 
 
-    private final EmailServiceSergiy emailService;
-    public TaskEmailSendSergiy(TaskService taskService, EmailServiceSergiy emailService) {
+    private final EmailService emailService;
+    public TaskEmailSend(TaskService taskService, EmailService emailService) {
         this.taskService = taskService;
         this.emailService = emailService;
                     // <- final é ok
