@@ -1,4 +1,4 @@
-package com.example.examplefeature.ui;
+package com.example.examplefeature.email;
 
 import com.example.base.ui.component.ViewToolbar;
 import com.example.examplefeature.Task;
@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.example.examplefeature.ui.TaskEmailSendSergiy;
-
 
 
 import java.time.ZoneId;
