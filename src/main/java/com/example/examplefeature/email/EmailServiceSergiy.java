@@ -1,5 +1,5 @@
 // src/main/java/com/example/examplefeature/mail/EmailServiceSergiy.java
-package com.example.examplefeature.ui;
+package com.example.examplefeature.email;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
