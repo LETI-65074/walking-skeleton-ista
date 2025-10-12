@@ -107,20 +107,7 @@ public class TaskEmailSend extends Main {
                 ViewToolbar.group(recipient, sendBtn)   // <- adiciona este grupo
         ));
 
-        authOverlay.setTitle("Confirmação");
-        authOverlay.setDescription("Autentica para enviar email");
-        authOverlay.setForgotPasswordButtonVisible(false);
-        authOverlay.addLoginListener(e -> {
-            if (authUser.equals(e.getUsername()) && authPass.equals(e.getPassword())) {
-                authenticated = true;
-                System.out.println(authUser + " " + authPass + " login feito") ;
-                authOverlay.setOpened(false);
-                // chama o envio real agora que está autenticado
-                doSendSelectedTask();  // método que envia de facto
-            } else {
-                authOverlay.setError(true);
-            }
-        });
+
 
 
         add(grid);
@@ -153,9 +140,6 @@ public class TaskEmailSend extends Main {
         }
 
 
-        if (!authenticated) {
-            authOverlay.setOpened(true);
-        }
 
 
         doSendSelectedTask();
