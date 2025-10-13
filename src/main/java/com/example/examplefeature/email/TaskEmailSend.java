@@ -1,4 +1,4 @@
-package com.example.examplefeature.ui;
+package com.example.examplefeature.email;
 
 import com.example.base.ui.component.ViewToolbar;
 import com.example.examplefeature.Task;
@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.example.examplefeature.ui.TaskEmailSendSergiy;
-
 
 
 import java.time.ZoneId;
@@ -32,7 +30,7 @@ import static com.vaadin.flow.spring.data.VaadinSpringDataHelpers.toSpringPageRe
 @Route("tasks-email")
 @PageTitle("Send Email")
 @Menu(order = 1, icon = "vaadin:envelope", title = "Send Email")
-public class TaskEmailSendSergiy extends Main {
+public class TaskEmailSend extends Main {
 
     private final TaskService taskService;
     private final Grid<Task> grid = new Grid<>();
@@ -60,8 +58,8 @@ public class TaskEmailSendSergiy extends Main {
                     .withZone(ZoneId.systemDefault());
 
 
-    private final EmailServiceSergiy emailService;
-    public TaskEmailSendSergiy(TaskService taskService, EmailServiceSergiy emailService) {
+    private final EmailService emailService;
+    public TaskEmailSend(TaskService taskService, EmailService emailService) {
         this.taskService = taskService;
         this.emailService = emailService;
                     // <- final é ok
@@ -109,20 +107,7 @@ public class TaskEmailSendSergiy extends Main {
                 ViewToolbar.group(recipient, sendBtn)   // <- adiciona este grupo
         ));
 
-        authOverlay.setTitle("Confirmação");
-        authOverlay.setDescription("Autentica para enviar email");
-        authOverlay.setForgotPasswordButtonVisible(false);
-        authOverlay.addLoginListener(e -> {
-            if (authUser.equals(e.getUsername()) && authPass.equals(e.getPassword())) {
-                authenticated = true;
-                System.out.println(authUser + " " + authPass + " login feito") ;
-                authOverlay.setOpened(false);
-                // chama o envio real agora que está autenticado
-                doSendSelectedTask();  // método que envia de facto
-            } else {
-                authOverlay.setError(true);
-            }
-        });
+
 
 
         add(grid);
@@ -155,9 +140,6 @@ public class TaskEmailSendSergiy extends Main {
         }
 
 
-        if (!authenticated) {
-            authOverlay.setOpened(true);
-        }
 
 
         doSendSelectedTask();
