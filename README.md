@@ -72,3 +72,10 @@ jobs:
           retention-days: 7
 
 Teste para jar files 
+
+---
+
+## 🎥 Vídeo do Projeto
+
+🔗 [Assista ao vídeo no YouTube](https://youtu.be/BWfPpgWG4os?si=sQgE1kjTwVhoelhu)
+
