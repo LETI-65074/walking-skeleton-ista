@@ -1,14 +1,26 @@
+## 🎥 Vídeo do Projeto
+
+
+🔗 [Assista ao vídeo no YouTube](https://youtu.be/BWfPpgWG4os?si=sQgE1kjTwVhoelhu)
+
 Este repositório usa um workflow do GitHub Actions que, a cada push na branch main (ou por execução manual via workflow_dispatch), faz o build de produção da aplicação (perfil -Pproduction, Java 21, Maven) e publica o JAR como artefacto da execução.
 O que o workflow faz:
+
 •	Checkout do código com histórico completo (compatível com passos que precisem de histórico).
+
 •	Configuração do JDK 21 (Temurin) com cache de dependências Maven.
+
 •	Build Maven de produção: mvn -B -Pproduction -Dmaven.test.skip=true clean package
 (gera o JAR em target/).
+
 •	Publicação do artefacto: o(s) target/*.jar é(são) carregado(s) nos artefactos da execução, com retenção de 7 dias.
 Gatilhos e salvaguardas:
+
 •	Executa em push para main; pode ser corrido manualmente (Run workflow).
+
 •	paths-ignore: "*.jar" evita loops caso JARs sejam adicionados ao repositório.
 Como obter o JAR:
+
 •	Ir a Actions → (execução mais recente) → Artifacts e descarregar o ficheiro publicado.
 Benefício: garante build reprodutível e empacotamento automático em cada alteração integrada na main, centralizando a distribuição do binário diretamente nas execuções do Actions.
 
