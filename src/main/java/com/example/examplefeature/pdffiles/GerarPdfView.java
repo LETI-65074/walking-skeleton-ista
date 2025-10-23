@@ -68,9 +68,9 @@ class GerarPdfView extends Main {
         grid.asSingleSelect().addValueChangeListener(e -> {
             var t = e.getValue();
             imprimir.setEnabled(imprimirTodas.getValue() || t != null);
-            if (!imprimirTodas.getValue() && t != null && (nome.isEmpty() || nome.getValue().isBlank())) {
+           /* if (!imprimirTodas.getValue() && t != null && (nome.isEmpty() || nome.getValue().isBlank())) {
                 nome.setValue(sanitize(t.getDescription() == null ? "tarefa" : t.getDescription()));
-            }
+            }*/
         });
         add(nome, imprimirTodas, imprimir, grid);
         setSizeFull();
@@ -89,9 +89,9 @@ class GerarPdfView extends Main {
             } else {
                 Task t = grid.asSingleSelect().getValue();
                 if (t == null) return; // nada selecionado
-                if (nome.isEmpty() || nome.getValue().isBlank()) {
+                /*if (nome.isEmpty() || nome.getValue().isBlank()) {
                     base = sanitize(t.getDescription() == null ? "tarefa" : t.getDescription());
-                }
+                }*/
                 pdf = pdfService.taskToPdf(t, getLocale());
             }
 
