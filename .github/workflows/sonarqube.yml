@@ -1,11 +1,11 @@
-name: SonarQube (push main)
+name: SonarCloud Maven (push main)
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  sonarqube:
+  sonar_maven:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,19 +17,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: SonarQube Quality Gate check
-        id: qg
-        uses: SonarSource/sonarqube-quality-gate-action@v1
+      - name: Setup JDK
+        uses: actions/setup-java@v4
         with:
-          pollingTimeoutSec: 600
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build & Sonar (Maven)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      - name: Print Quality Gate status
         run: |
-          echo "Quality Gate: ${{ steps.qg.outputs.quality-gate-status }}"
+          mvn -B -DskipTests verify \
+            org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.projectKey=LETI-65074_walking-skeleton-ista \
+            -Dsonar.organization=<A_TUA_ORG_SONARCLOUD> \
+            -Dsonar.token=${SONAR_TOKEN}
