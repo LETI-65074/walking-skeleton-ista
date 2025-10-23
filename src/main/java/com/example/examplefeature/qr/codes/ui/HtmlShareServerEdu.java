@@ -27,9 +27,15 @@ class HtmlShareServerEdu {
 
             // auto-desliga (default 5 min)
             long minutes = autoShutdownMinutes <= 0 ? 5 : autoShutdownMinutes;
+            @SuppressWarnings("resource")
             ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
-            ses.schedule(() -> { try { server.stop(0); } finally { ses.shutdownNow(); } },
-                    minutes, TimeUnit.MINUTES);
+            ses.schedule(() -> {
+                try {
+                    server.stop(0);
+                } finally {
+                    ses.shutdownNow();
+                }
+            }, minutes, TimeUnit.MINUTES);
 
             int port = server.getAddress().getPort();
             String host = firstSiteLocalIPv4(); // 192.168.x.y (ou null)
