@@ -32,7 +32,8 @@ public class QrCodeServiceEdu {
              ZipOutputStream zip = new ZipOutputStream(out, StandardCharsets.UTF_8)) {
 
             for (int i = 0; i < urls.size(); i++) {
-                String base = sanitize(tasks.get(i).getDescription() == null ? "tarefa" : tasks.get(i).getDescription());
+                String base = sanitize(tasks.get(i).getDescription());
+
                 byte[] png = urlToQrPng(urls.get(i));
 
                 zip.putNextEntry(new ZipEntry(base + ".png"));
