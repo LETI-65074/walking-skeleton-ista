@@ -1,0 +1,73 @@
+name: SonarQube (push main)
+
+on:
+  push:
+    branches: [ "main" ]
+  # (Opcional) analisa também PRs para main:
+  # pull_request:
+  #   branches: [ "main" ]
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # recomendado para relatórios mais completos
+
+      # —— SE PRECISARES DE BUILD/TESTES, DESCOMENTA UMA DAS SECÇÕES ABAIXO ——
+      # Java (Maven)
+      # - name: Setup JDK
+      #   uses: actions/setup-java@v4
+      #   with:
+      #     distribution: temurin
+      #     java-version: '21'
+      # - name: Build (Maven)
+      #   run: mvn -B -DskipTests package
+
+      # Java (Gradle)
+      # - name: Setup JDK
+      #   uses: actions/setup-java@v4
+      #   with:
+      #     distribution: temurin
+      #     java-version: '21'
+      # - name: Build (Gradle)
+      #   run: ./gradlew build -x test
+
+      # Node/JS (exemplo)
+      # - name: Setup Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '20'
+      # - name: Install & test
+      #   run: |
+      #     npm ci
+      #     npm test --silent || true   # não falhar o job por testes, se não quiseres
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        # Se já tens o ficheiro sonar-project.properties na raiz (tens),
+        # não é preciso passar args. Se preferires parametrizar aqui:
+        # with:
+        #   args: >
+        #     -Dsonar.projectKey=LETI-65074_walking-skeleton-ista
+        #     -Dsonar.sources=src
+
+      - name: SonarQube Quality Gate check
+        id: qg
+        uses: SonarSource/sonarqube-quality-gate-action@v1
+        with:
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # Conforme combinado, NÃO usar SONAR_HOST_URL (removido)
+
+      - name: Mostrar estado do Quality Gate
+        run: echo "Quality Gate: ${{ steps.qg.outputs.quality-gate-status }}"
